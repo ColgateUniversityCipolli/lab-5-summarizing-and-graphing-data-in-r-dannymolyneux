@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage[shortlabels]{enumitem}% For enumerated lists with labels specified
+                                  % We had to run tlmgr_install("enumitem") in R
+\hypersetup{colorlinks = true,citecolor=black} %set citations to have black (not green) color
+\usepackage{natbib}        %For the bibliography
+\setlength{\bibsep}{0pt plus 0.3ex}
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=0.50in]{geometry}
+\usepackage{float}
+\usepackage{multicol}
+
+%fix for figures
+\usepackage{caption}
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+\begin{document}
+
+\vspace{-1in}
+\title{Lab 03 -- MATH 240 -- Computational Statistics}
+
+\author{
+  Danny Molyneux \\
+  Colgate University  \\
+  Mathematics  \\
+  {\tt dmolyneux@colgate.edu}
+}
+
+\date{Feb 10 2024}
+
+\maketitle
+
+
+\begin{multicols}{2}
+\begin{abstract}
+In this lab we are tasked with building a batch file to improve efficiency when dealing with many files. In this case, these files are tracks. I use many different functions including \texttt{paste()}, \texttt{str\textunderscore sub()}, \texttt{str\textunderscore split()}, and many more in order to extract and display certain information for each track. We are then tasked with cleaning data and then merging three data frames together. One data frame consisted of the type of data we processed last lab from a .JSON file, like danceability, average loudness, etc. The second data frame included the data from the Essentia models, such as moods, instrumentation, etc. Lastly, we have a data frame that has data from a text analysis tool called LIWC. This has features describing feelings and personality traits.
+\end{abstract}
+
+\noindent \textbf{Keywords:} Accessing; directories; files; Data Frames
+
+
+\section{Introduction}
+The goal here is to address the question ``Which band contributed most to the song?". We don't go on to answer this question in this lab, but we make progress towards being able to answer that kind of question. This comes from a song in 2018 that The Front Bottoms and Manchester Orchestra collaborated on, called Allentown. We will  be analyzing songs from those two bands, as well as All Get Out.  
+
+Like I said, we don't answer the overarching question about who contributed more, but we do build a batch file that can process all of the tracks, process the output of .JSON files, clean data from the Essentia models, and merge three data frames that contain different kinds of data on the songs/lyrics.
+
+
+\section{Methods}
+Last lab, I was working with a music directory that contains two authors, each having multiple albums, containing multiple tracks. Knowing how to create that batch file was really helpful for this lab, due to the fact that I had 181 .JSON files to process and extract data from.
+
+The new methods that I utilized for this lab were mainly methods that modify data frames. Deleting/adding columns, changing column names, adding columns together, and finally, merging data frames. In order to clean and modify all of the data, I had to install the stringr \citep{stringr} package for \texttt{R}. And in order to process .JSON files using \texttt{fromJSON()}, I installed the jsonlite \citep{jsonlite} package for \texttt{R}.
+
+Overall, I ended up working with three data frames that each had 181 rows, and a combined 146 columns (140 after merging due to duplications).
+
+To wrap up this lab, we finally start to work towards answering the overarching question: ``Which band contributed most to the song?" I do this by creating plots that give potential insights to the answers of this question.
+
+
+\section{Results}
+Although I didn't really get any concrete results to the overarching question, now I know how to extract all of these various attributes of a .JSON file, as well as doing it for 180 .JSON files. This data could indicate how much someone contributes to a song, which we will dive deeper into next lab. For example,  the length of time each band plays, or how loud they are in relation to each other. Now that we have a lot of data from each band invidually, in addition to their song together, we will hopefully be able to get a lot of good insights. The plots I made at the end didn't give me much information, but it did indicate that in regards to happiness, sadness, overall loudness, and beats loudness, Allentown was more similar to the average Manchester Orchestra song, than the average song by The Front Bottoms.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{2em}
+
+\noindent\textbf{Bibliography:} 
+
+\begin{tiny}
+\bibliography{bib}
+\end{tiny}
+\end{multicols}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\onecolumn
+\section{Appendix}
+
+
+
+\end{document}
+
