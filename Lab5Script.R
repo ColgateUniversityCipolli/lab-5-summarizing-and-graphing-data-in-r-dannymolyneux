@@ -36,6 +36,8 @@ for(feature_name in numeric.cols) {  #goes through every numeric column
   range_results = bind_rows(range_results, feature_data)
 }
 view(range_results)
+
+#step 3 (xtable)
 library(xtable)
 print(xtable(range_results,                       # Table to print
              caption = "Results of each essentia feature vs Allentown", # Caption for the table
@@ -43,6 +45,8 @@ print(xtable(range_results,                       # Table to print
       table.placement = "H")  
 installed.packages("dplyr")
 library(dplyr)
+
+#step 4 (plots)
 
 #groups by artist and description so that I can calculate proportions
 description_counts <- range_results %>%
@@ -54,7 +58,7 @@ description_counts <- description_counts %>%
   group_by(artist) %>%
   mutate(proportion = count / sum(count))
 
-#side by side
+#side by side pie charts of description proportions for each artist
 pie.chart<-ggplot(description_counts)+
   geom_bar(aes(x="", 
                y=proportion,
@@ -66,6 +70,7 @@ pie.chart<-ggplot(description_counts)+
   labs(fill="")+
   facet_wrap(~artist)
 
+#side by side pie charts of description proportions for each artist
 doughnut.plot<-ggplot(description_counts)+
   geom_bar(aes(x=2, 
                y=proportion,
@@ -79,17 +84,26 @@ doughnut.plot<-ggplot(description_counts)+
   facet_wrap(~artist)+
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
-important_features = c("overall_loudness", "danceability", "duration", "affect", "emotion")
-range_results
+#Four features I am interested in
+significant_features = c("overall_loudness", "danceability", "duration", "emotion")
+significant_results = range_results |>
+  filter(feature %in% significant_features) |> #filters out the other features
+  select(artist, feature, min, max, LF, UF, allentown_feature)  #stats needed for box plot
 
-box.plot = ggplot(data=range_results,                       # Specify the data
-       aes(x=artist, y=description)) +      # Specify x and y
-  geom_boxplot() +
-  theme_bw()+                                    # Remove the grey background
-  xlab("Artist")+                        # Label x axis
-  ylab("Description")     
+#side by side box plots for the 4 features I chose
+box.plot = ggplot(data=significant_results,   
+       aes(x=artist, y=allentown_feature)) +    
+  geom_boxplot(aes(ymin = min, lower = LF, upper = UF, middle = (LF+UF)/2, ymax = max), stat = "identity", width = 0.25) +
+  theme_bw()+ 
+  geom_point(size = 3, color = "blue")+  #places a point where the allentown value is
+  facet_wrap(~feature, scales = "free")+
+  xlab("Artist")+                       
+  ylab("Feature value")+   
+  ggtitle("Boxplot Comparison of Artist's For Important Features")
 
-
+pie.chart
+doughnut.plot
+box.plot
 
 
 
