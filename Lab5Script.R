@@ -84,11 +84,22 @@ doughnut.plot<-ggplot(description_counts)+
   facet_wrap(~artist)+
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
+#side-by-side column plot of the proportions of each description for each artist
+column.plot <- ggplot(data=description_counts)+
+  geom_col(aes(x=artist, y = proportion, fill=description),    
+           position = position_dodge(.9)) + 
+  geom_hline(yintercept = 0)+
+  xlab("Artist")+                        
+  ylab("Proportion")+                       
+  ylim(0,1)+                          
+  theme_bw() 
+
 #Four features I am interested in
 significant_features = c("overall_loudness", "danceability", "duration", "emotion")
 significant_results = range_results |>
   filter(feature %in% significant_features) |> #filters out the other features
   select(artist, feature, min, max, LF, UF, allentown_feature)  #stats needed for box plot
+
 
 #side by side box plots for the 4 features I chose
 box.plot = ggplot(data=significant_results,   
@@ -101,8 +112,11 @@ box.plot = ggplot(data=significant_results,
   ylab("Feature value")+   
   ggtitle("Boxplot Comparison of Artist's For Important Features")
 
+
+
 pie.chart
 doughnut.plot
+column.plot
 box.plot
 
 
