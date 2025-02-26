@@ -1,9 +1,9 @@
 install.packages("tidyverse")
 library(tidyverse)
 essentia.data = read.csv("data/essentia.data.csv") #data for all the tracks other than allentown
-view(essentia.data)
+#view(essentia.data)
 allentown.data = read.csv("data/essentia.data.allentown.csv")  #data for allentown
-view(allentown.data)
+#view(allentown.data)
 
 #function that determines whether a given feature in Allentown is out of range, unusual, or within the range for each band
 check_range = function(data, feature){
@@ -26,8 +26,8 @@ check_range = function(data, feature){
 
 #step 2 (apply the function to all of the data)
 numeric.cols = names(essentia.data)[sapply(essentia.data, is.numeric)] #list of only numeric columns in essentia.data
-not.numeric = setdiff(names(essentia.data), numeric.cols)
-not.numeric
+#not.numeric = setdiff(names(essentia.data), numeric.cols)
+#not.numeric
 range_results <- data.frame()  #empty list that will store the results for each feature
 for(feature_name in numeric.cols) {  #goes through every numeric column
   feature_data = check_range(essentia.data, feature_name)  #adds the info for that feature to a data frame
@@ -35,20 +35,47 @@ for(feature_name in numeric.cols) {  #goes through every numeric column
   #keeps adding the data for each feature to the overall data set
   range_results = bind_rows(range_results, feature_data)
 }
-view(range_results)
+#view(range_results)
 
-#step 3 (xtable)
+#step3 and 4 (xtable and plots)
+
+#Four features I am interested in
+significant_features = c("overall_loudness", "danceability", "duration", "emotion")
+significant_results = range_results |>
+  filter(feature %in% significant_features) |> #filters out the other features
+  select(artist, feature, description) #stats for table
+  
+#view(significant_results)
+
 library(xtable)
-print(xtable(range_results,                       # Table to print
+print(xtable(significant_results,                 # Table to print
              caption = "Results of each essentia feature vs Allentown", # Caption for the table
              label = "range_results:reference"),   # Label to reference 
       table.placement = "H")  
 installed.packages("dplyr")
 library(dplyr)
 
-#step 4 (plots)
 
-#groups by artist and description so that I can calculate proportions
+#update data frame to have the stats needed for a box plot
+significant_results = range_results |>
+  filter(feature %in% significant_features) |> #filters out the other features
+  select(artist, feature, min, max, LF, UF, allentown_feature)  #stats needed for box plot
+
+#side by side box plots for the 4 features I chose
+box.plot = ggplot(data=significant_results,   
+                  aes(x=artist, y=allentown_feature)) +    
+  geom_boxplot(aes(ymin = min, lower = LF, upper = UF, middle = (LF+UF)/2, ymax = max), stat = "identity", width = 0.25) +
+  theme_bw()+ 
+  geom_point(size = 3, color = "blue")+  #places a point where the allentown value is
+  facet_wrap(~feature, scales = "free")+
+  xlab("Artist")+                       
+  ylab("Feature value")+   
+  ggtitle("Boxplot Comparison of Artist's For Important Features")+
+  theme(axis.text.x = element_text(size = 7)) #make the band names visible
+
+
+
+#groups by artist and description so that I can calculate sums of each description
 description_counts <- range_results %>%
   group_by(artist, description) %>%
   summarise(count = n(), .groups = "drop")
@@ -94,30 +121,11 @@ column.plot <- ggplot(data=description_counts)+
   ylim(0,1)+                          
   theme_bw() 
 
-#Four features I am interested in
-significant_features = c("overall_loudness", "danceability", "duration", "emotion")
-significant_results = range_results |>
-  filter(feature %in% significant_features) |> #filters out the other features
-  select(artist, feature, min, max, LF, UF, allentown_feature)  #stats needed for box plot
-
-
-#side by side box plots for the 4 features I chose
-box.plot = ggplot(data=significant_results,   
-       aes(x=artist, y=allentown_feature)) +    
-  geom_boxplot(aes(ymin = min, lower = LF, upper = UF, middle = (LF+UF)/2, ymax = max), stat = "identity", width = 0.25) +
-  theme_bw()+ 
-  geom_point(size = 3, color = "blue")+  #places a point where the allentown value is
-  facet_wrap(~feature, scales = "free")+
-  xlab("Artist")+                       
-  ylab("Feature value")+   
-  ggtitle("Boxplot Comparison of Artist's For Important Features")
-
-
-
+box.plot
 pie.chart
 doughnut.plot
 column.plot
-box.plot
+
 
 
 
